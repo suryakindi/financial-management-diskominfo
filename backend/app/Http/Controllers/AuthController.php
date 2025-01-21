@@ -58,39 +58,7 @@ class AuthController extends Controller
         return $this->baseResponse('Token invalid', 'Gagal', auth()->user(), 401);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/auth/register-user",
-     *     summary="Registrasi Pengguna Baru",
-     *     description="Endpoint ini digunakan untuk mendaftarkan pengguna baru.",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name", "email", "password"},
-     *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", example="user@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Pengguna berhasil didaftarkan",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Sukses mendaftarkan pengguna."),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Email sudah digunakan",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Email sudah digunakan."),
-     *             @OA\Property(property="status", type="string", example="error")
-     *         )
-     *     )
-     * )
-     */
+    
     
     public function Register(UserRegister $request)
     {
@@ -147,38 +115,6 @@ class AuthController extends Controller
         }
     }
      
-    /**
-     * @OA\Post(
-     *     path="/api/auth/login-user",
-     *     summary="Login Pengguna",
-     *     description="Endpoint ini digunakan untuk login pengguna dan mendapatkan token autentikasi.",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email", "password"},
-     *             @OA\Property(property="email", type="string", example="user@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Login berhasil dan token diperoleh",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Login Sukses"),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Email atau password salah",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Gagal Login"),
-     *             @OA\Property(property="status", type="string", example="error")
-     *         )
-     *     )
-     * )
-     */
 
     public function LoginUser(Request $request)
     {
