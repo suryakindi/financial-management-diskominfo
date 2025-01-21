@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRegister;
+
+/**
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="API Autentikasi",
+ *     description="API untuk registrasi dan login pengguna.",
+ *     @OA\Contact(
+ *         email="contact@company.com"
+ *     )
+ * )
+ */
+class AuthController extends Controller
+{
+    /**
+     * @OA\Get(
+     *     path="/api/v1/check-token/",
+     *     summary="Periksa Validitas Token",
+     *     description="Memeriksa apakah token autentikasi valid.",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Token valid",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Token Valid"),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Token invalid",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Token invalid"),
+     *             @OA\Property(property="status", type="string", example="error")
+     *         )
+     *     )
+     * )
+     */
+    public function CheckToken(){
+        if (auth()->check()) {
+            // Jika Token Ada
+            return $this->baseResponse('Token Valid', null, auth()->user(), 200);
+        }
+        // Jika Token Tidak Ada
+        return $this->baseResponse('Token invalid', 'Gagal', auth()->user(), 401);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/register-user",
+     *     summary="Registrasi Pengguna Baru",
+     *     description="Endpoint ini digunakan untuk mendaftarkan pengguna baru.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Pengguna berhasil didaftarkan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Sukses mendaftarkan pengguna."),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Email sudah digunakan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Email sudah digunakan."),
+     *             @OA\Property(property="status", type="string", example="error")
+     *         )
+     *     )
+     * )
+     */
+    public function Register(UserRegister $request)
+    {
+        $validatedData = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+            if (User::where('email', $validatedData['email'])->exists()) {
+                return $this->baseResponse(
+                    'Email sudah digunakan.',
+                    'Email ' . $validatedData['email'] . ' telah terdaftar.',
+                    null,
+                    400
+                );
+            }
+
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+            ]);
+
+            DB::commit();
+            return $this->baseResponse(
+                'Sukses mendaftarkan pengguna.',
+                'Pengguna berhasil didaftarkan.',
+                $user,
+                201
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->baseResponse(
+                'Gagal mendaftarkan pengguna.',
+                $e->getMessage(),
+                null,
+                500
+            );
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login-user",
+     *     summary="Login Pengguna",
+     *     description="Endpoint ini digunakan untuk login pengguna dan mendapatkan token autentikasi.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login berhasil dan token diperoleh",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login Sukses"),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Email atau password salah",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Gagal Login"),
+     *             @OA\Property(property="status", type="string", example="error")
+     *         )
+     *     )
+     * )
+     */
+    public function LoginUser(Request $request)
+    {
+        $checkuser = User::where('email', $request->email)->first();
+
+        if (!$checkuser || !Hash::check($request->password, $checkuser->password)) {
+            return $this->baseResponse('Gagal Login', 'Unauthorized', $request->all(), 401);
+        }
+
+        $token = $checkuser->createToken('scan')->plainTextToken;
+        $data = [
+            'data' => $checkuser,
+            'token' => $token,
+        ];
+
+        return $this->baseResponse('Login Sukses', null, $data, 200);
+    }
+}

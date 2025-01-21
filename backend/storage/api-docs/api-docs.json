@@ -1,0 +1,229 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Autentikasi",
+        "description": "API untuk registrasi dan login pengguna.",
+        "contact": {
+            "email": "contact@company.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/check-token/": {
+            "get": {
+                "summary": "Periksa Validitas Token",
+                "description": "Memeriksa apakah token autentikasi valid.",
+                "operationId": "8066844a15b1e3c23f11af0d23fd55a6",
+                "responses": {
+                    "200": {
+                        "description": "Token valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token Valid"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token invalid"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/register-user": {
+            "post": {
+                "summary": "Registrasi Pengguna Baru",
+                "description": "Endpoint ini digunakan untuk mendaftarkan pengguna baru.",
+                "operationId": "258c3f2bef9de37a9b5a496fca04934f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pengguna berhasil didaftarkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sukses mendaftarkan pengguna."
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email sudah digunakan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email sudah digunakan."
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login-user": {
+            "post": {
+                "summary": "Login Pengguna",
+                "description": "Endpoint ini digunakan untuk login pengguna dan mendapatkan token autentikasi.",
+                "operationId": "4ba6aac60216a17d60bb11564f919314",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil dan token diperoleh",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login Sukses"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Email atau password salah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gagal Login"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
