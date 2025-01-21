@@ -12,8 +12,79 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use DB;
+
+
 class TransactionController extends Controller
 {
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/transactions",
+     *     operationId="createTransaction",
+     *     tags={"Transactions"},
+     *     summary="Membuat transaksi",
+     *     description="Membuat transaksi baru baik untuk pendapatan atau pengeluaran dan memperbarui saldo pengguna.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"id_user", "id_category", "amount", "description"},
+     *             @OA\Property(property="id_user", type="integer", description="ID User"),
+     *             @OA\Property(property="id_category", type="integer", description="ID Kategori"),
+     *             @OA\Property(property="amount", type="number", format="float", description="Jumlah uang transaksi"),
+     *             @OA\Property(property="description", type="string", description="Deskripsi transaksi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Transaksi berhasil dibuat",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Sukses membuat transaksi."),
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="transaction", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="id_user", type="integer", example=1),
+     *                 @OA\Property(property="id_category", type="integer", example=3),
+     *                 @OA\Property(property="amount", type="number", format="float", example=500),
+     *                 @OA\Property(property="description", type="string", example="Pendapatan dari freelance"),
+     *                 @OA\Property(property="date", type="string", format="date", example="2025-01-21")
+     *             )
+     *         ),
+     *         @OA\Header(
+     *             header="X-Request-ID",
+     *             description="ID unik untuk setiap request",
+     *             @OA\Schema(type="string", example="abcd1234")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Request tidak valid",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Input tidak lengkap atau tidak valid."),
+     *             @OA\Property(property="errors", type="object")
+     *         ),
+     *         @OA\Header(
+     *             header="X-Request-ID",
+     *             description="ID unik untuk setiap request",
+     *             @OA\Schema(type="string", example="abcd1234")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Gagal membuat transaksi."),
+     *             @OA\Property(property="error", type="string")
+     *         ),
+     *         @OA\Header(
+     *             header="X-Request-ID",
+     *             description="ID unik untuk setiap request",
+     *             @OA\Schema(type="string", example="abcd1234")
+     *         )
+     *     )
+     * )
+     */
+
     public function createTransaction(Request $request)
     {   
        
@@ -132,6 +203,7 @@ class TransactionController extends Controller
         }
     }
 
+    
     public function getCategory(Request $request){
         $category = Category::get();
 

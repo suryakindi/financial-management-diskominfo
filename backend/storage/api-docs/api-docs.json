@@ -61,7 +61,7 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "BearerToken": []
                     }
                 ]
             }
@@ -224,6 +224,180 @@
                     }
                 }
             }
+        },
+        "/api/v1/transactions": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Membuat transaksi",
+                "description": "Membuat transaksi baru baik untuk pendapatan atau pengeluaran dan memperbarui saldo pengguna.",
+                "operationId": "createTransaction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_user",
+                                    "id_category",
+                                    "amount",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "id_user": {
+                                        "description": "ID User",
+                                        "type": "integer"
+                                    },
+                                    "id_category": {
+                                        "description": "ID Kategori",
+                                        "type": "integer"
+                                    },
+                                    "amount": {
+                                        "description": "Jumlah uang transaksi",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "description": {
+                                        "description": "Deskripsi transaksi",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Transaksi berhasil dibuat",
+                        "headers": {
+                            "X-Request-ID": {
+                                "description": "ID unik untuk setiap request",
+                                "schema": {
+                                    "type": "string",
+                                    "example": "abcd1234"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sukses membuat transaksi."
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "transaction": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_user": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_category": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Pendapatan dari freelance"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-01-21"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Request tidak valid",
+                        "headers": {
+                            "X-Request-ID": {
+                                "description": "ID unik untuk setiap request",
+                                "schema": {
+                                    "type": "string",
+                                    "example": "abcd1234"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Input tidak lengkap atau tidak valid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "headers": {
+                            "X-Request-ID": {
+                                "description": "ID unik untuk setiap request",
+                                "schema": {
+                                    "type": "string",
+                                    "example": "abcd1234"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gagal membuat transaksi."
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Transactions",
+            "description": "Transactions"
+        }
+    ]
 }

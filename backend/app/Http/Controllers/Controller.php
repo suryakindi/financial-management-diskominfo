@@ -7,6 +7,17 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+/**
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="API Autentikasi",
+ *     description="API untuk registrasi dan login pengguna.",
+ *     @OA\Contact(
+ *         email="contact@company.com"
+ *     )
+ * )
+ */
+
 
 class Controller extends BaseController
 {

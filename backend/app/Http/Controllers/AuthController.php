@@ -8,43 +8,46 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRegister;
 
-/**
- * @OA\Info(
- *     version="1.0.0",
- *     title="API Autentikasi",
- *     description="API untuk registrasi dan login pengguna.",
- *     @OA\Contact(
- *         email="contact@company.com"
+
+class AuthController extends Controller
+{
+
+    /**
+ * @OA\SecurityScheme(
+ *     securityScheme="BearerToken",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT", 
+ *     description="Gunakan token ini di header Authorization: Bearer {token}"
+ * )
+ */
+    /**
+ * @OA\Get(
+ *     path="/api/v1/check-token/",
+ *     summary="Periksa Validitas Token",
+ *     description="Memeriksa apakah token autentikasi valid.",
+ *     security={{"BearerToken":{}}}, 
+ *     @OA\Response(
+ *         response=200,
+ *         description="Token valid",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Token Valid"),
+ *             @OA\Property(property="status", type="string", example="success"),
+ *             @OA\Property(property="data", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Token invalid",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Token invalid"),
+ *             @OA\Property(property="status", type="string", example="error")
+ *         )
  *     )
  * )
  */
-class AuthController extends Controller
-{
-    /**
-     * @OA\Get(
-     *     path="/api/v1/check-token/",
-     *     summary="Periksa Validitas Token",
-     *     description="Memeriksa apakah token autentikasi valid.",
-     *     security={{"sanctum":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Token valid",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Token Valid"),
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Token invalid",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Token invalid"),
-     *             @OA\Property(property="status", type="string", example="error")
-     *         )
-     *     )
-     * )
-     */
+
+
     public function CheckToken(){
         if (auth()->check()) {
             // Jika Token Ada
