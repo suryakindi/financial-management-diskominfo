@@ -11,11 +11,14 @@ Proyek ini adalah aplikasi untuk **manajemen keuangan** yang dikerjakan sebagai 
   - PostgreSQL
 - **Frontend:**
   - ReactJS
+- **Support System:**
+  - Kopi ☕
+  - Rokok 🚬
+
 - **Tools & Dependencies:**
   - Composer (PHP dependency manager)
   - NPM / Yarn (Node package manager)
   - Docker (optional, for development and deployment)
   
-- **Tambahan**:
-  - Kopi ☕
-  - Rokok 🚬
+
+
