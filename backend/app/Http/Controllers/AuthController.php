@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\UserRegister;
 
 
@@ -90,14 +91,22 @@ class AuthController extends Controller
      *     )
      * )
      */
+    
     public function Register(UserRegister $request)
     {
         $validatedData = $request->validated();
-
+    
+        
+        Log::channel('single')->info('Proses pendaftaran dimulai untuk email: ' . $validatedData['email']);
+    
         DB::beginTransaction();
-
+    
         try {
+        
             if (User::where('email', $validatedData['email'])->exists()) {
+            
+                Log::channel('single')->warning('Email sudah terdaftar: ' . $validatedData['email']);
+    
                 return $this->baseResponse(
                     'Email sudah digunakan.',
                     'Email ' . $validatedData['email'] . ' telah terdaftar.',
@@ -105,14 +114,19 @@ class AuthController extends Controller
                     400
                 );
             }
-
+    
+            // Membuat pengguna baru
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
             ]);
-
+    
             DB::commit();
+    
+        
+            Log::channel('single')->info('Pendaftaran pengguna berhasil untuk email: ' . $validatedData['email']);
+    
             return $this->baseResponse(
                 'Sukses mendaftarkan pengguna.',
                 'Pengguna berhasil didaftarkan.',
@@ -121,6 +135,9 @@ class AuthController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
+    
+            Log::channel('single')->error('Gagal mendaftarkan pengguna untuk email: ' . $validatedData['email'] . '. Error: ' . $e->getMessage());
+    
             return $this->baseResponse(
                 'Gagal mendaftarkan pengguna.',
                 $e->getMessage(),
@@ -129,7 +146,7 @@ class AuthController extends Controller
             );
         }
     }
-
+     
     /**
      * @OA\Post(
      *     path="/api/auth/login-user",
@@ -162,20 +179,29 @@ class AuthController extends Controller
      *     )
      * )
      */
+
     public function LoginUser(Request $request)
     {
+        Log::channel('single')->info('Proses login dimulai untuk email: ' . $request->email);
+    
         $checkuser = User::where('email', $request->email)->first();
-
+    
         if (!$checkuser || !Hash::check($request->password, $checkuser->password)) {
+            Log::channel('single')->warning('Login gagal untuk email: ' . $request->email . '. Penyebab: Email atau password salah.');
+    
             return $this->baseResponse('Gagal Login', 'Unauthorized', $request->all(), 401);
         }
-
+    
+        Log::channel('single')->info('Login berhasil untuk email: ' . $request->email);
+    
         $token = $checkuser->createToken('scan')->plainTextToken;
         $data = [
             'data' => $checkuser,
             'token' => $token,
         ];
-
+    
+        Log::channel('single')->info('Token berhasil dibuat untuk email: ' . $request->email);
+    
         return $this->baseResponse('Login Sukses', null, $data, 200);
     }
 }
