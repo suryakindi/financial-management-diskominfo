@@ -13,6 +13,15 @@ use Illuminate\Http\Request;
 
 use DB;
 
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT",
+ *     description="Gunakan token autentikasi Bearer untuk mengakses endpoint API."
+ * )
+ */
 
 class TransactionController extends Controller
 {
@@ -175,6 +184,8 @@ class TransactionController extends Controller
     }
 
 
+    
+
     public function createCategory(Request $request){
         $request->validate([
             'category' => 'required',
@@ -203,7 +214,45 @@ class TransactionController extends Controller
         }
     }
 
-    
+    /**
+     * @OA\Get(
+     *     path="/api/v1/get-category",
+     *     summary="Get all categories",
+     *     description="Retrieve all available categories from the database.",
+     *     tags={"Category"},
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved categories.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Sukses Mendapatkan Category."),
+     *             @OA\Property(property="description", type="string", example="berhasil ditambahkan."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Category Name")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No categories found.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Data Tidak Ditemukan"),
+     *             @OA\Property(property="description", type="string", example="null"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
+     */
     public function getCategory(Request $request){
         $category = Category::get();
 
@@ -248,6 +297,46 @@ class TransactionController extends Controller
             );
         }
     }
+    
+    /**
+     * @OA\Get(
+     *     path="/api/v1/get-type",
+     *     summary="Get all types",
+     *     description="Retrieve all available types from the database.",
+     *     tags={"Type"},
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved types.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Sukses Mendapatkan Type."),
+     *             @OA\Property(property="description", type="string", example="berhasil ditambahkan."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Type Name")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No types found.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Data Tidak Ditemukan"),
+     *             @OA\Property(property="description", type="string", example="null"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
+     */
     public function getType(Request $request){
         $type = Type::get();
 
@@ -262,6 +351,89 @@ class TransactionController extends Controller
             200 
         );
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/reports/monthly",
+     *     summary="Get transactions for a specific month and year",
+     *     description="Retrieve all transactions for a user for a given month and year, including total income, expense, and user balance.",
+     *     tags={"Transactions"},
+     *     security={{
+     *         "bearerAuth": {}
+     *     }},
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         required=true,
+     *         @OA\Schema(type="integer"),
+     *         description="ID of the user"
+     *     ),
+     *     @OA\Parameter(
+     *         name="month",
+     *         in="query",
+     *         required=true,
+     *         @OA\Schema(type="integer", minimum=1, maximum=12),
+     *         description="Month for the transactions (1-12)"
+     *     ),
+     *     @OA\Parameter(
+     *         name="year",
+     *         in="query",
+     *         required=true,
+     *         @OA\Schema(type="integer"),
+     *         description="Year for the transactions"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Transactions successfully retrieved",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Transaksi ditemukan."),
+     *             @OA\Property(property="description", type="string", example="Data transaksi untuk user ID 1 pada bulan 1 tahun 2025."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="month", type="string", example="1 2025"),
+     *                 @OA\Property(property="total_income", type="number", example=5000),
+     *                 @OA\Property(property="total_expense", type="number", example=3000),
+     *                 @OA\Property(property="balance", type="number", example=2000),
+     *                 @OA\Property(
+     *                     property="detail_data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="amount", type="number", example=1000),
+     *                         @OA\Property(property="category_name", type="string", example="Food"),
+     *                         @OA\Property(property="type_name", type="string", example="Expense"),
+     *                         @OA\Property(property="user_name", type="string", example="John Doe"),
+     *                         @OA\Property(property="user_balance", type="number", example=2000),
+     *                         @OA\Property(property="date", type="string", format="date", example="2025-01-10")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Input tidak lengkap atau tidak valid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No transactions found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Data Tidak Ditemukan"),
+     *             @OA\Property(property="description", type="string", example="null"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
+     */
 
     public function getMonthly(Request $request)
     {
@@ -509,6 +681,61 @@ class TransactionController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/get-budgets",
+     *     summary="Get all budgets for a specific user",
+     *     description="Retrieve all the budgets available for a specific user with their associated category information.",
+     *     tags={"Budget"},
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Parameter(
+     *         name="id_user",
+     *         in="query",
+     *         required=true,
+     *         description="User ID for retrieving their budgets.",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved the budgets.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Sukses Mendapatkan budgets."),
+     *             @OA\Property(property="description", type="string", example="berhasil."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="amount", type="number", format="float", example=1500.50),
+     *                     @OA\Property(property="description", type="string", example="January 2025 Budget"),
+     *                     @OA\Property(property="id_category", type="integer", example=3),
+     *                     @OA\Property(property="category_name", type="string", example="Utilities"),
+     *                     @OA\Property(property="user_name", type="string", example="John Doe"),
+     *                     
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No budgets found for the user.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Data Tidak Ditemukan"),
+     *             @OA\Property(property="description", type="string", example="null"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
+     */
+
     public function getBudget(Request $request){
         $budgets = Budget::where('id_user', $request->id_user)
         ->leftJoin('categories', 'budgets.id_category', '=', 'categories.id')
@@ -531,6 +758,60 @@ class TransactionController extends Controller
             200 
         );
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/get-reminders",
+     *     summary="Get all reminders for a specific user",
+     *     description="Retrieve all the reminders for a specific user with their associated user information.",
+     *     tags={"Reminder"},
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Parameter(
+     *         name="id_user",
+     *         in="query",
+     *         required=true,
+     *         description="User ID for retrieving their reminders.",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved the reminders.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Sukses Mendapatkan reminder."),
+     *             @OA\Property(property="description", type="string", example="berhasil ditambahkan."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Reminder Title"),
+     *                     @OA\Property(property="description", type="string", example="Don't forget to pay the bill."),
+     *                     @OA\Property(property="reminder_date", type="string", format="date", example="2025-01-30"),
+     *                     @OA\Property(property="user_name", type="string", example="John Doe"),
+     *                    
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No reminders found for the user.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Data Tidak Ditemukan"),
+     *             @OA\Property(property="description", type="string", example="null"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
+     */
 
     public function GetReminder(Request $request){
         $reminder = Reminder::where('id_user', $request->id_user)
