@@ -18,7 +18,7 @@ class LogResponseTime
         $end = microtime(true);
         $duration = $end - $start;
 
-        Log::info('Response time: ' . $duration . ' seconds.');
+        Log::channel('daily')->info('Response time: ' . $duration . ' seconds.');
 
         return $response;
     }
