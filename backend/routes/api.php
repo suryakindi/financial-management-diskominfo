@@ -25,7 +25,7 @@ Route::middleware(['throttle:10,1'])->group(function () {
         Route::post('/login-user', [AuthController::class, 'LoginUser']);
     });
 });
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', 'log.response.time'])->prefix('v1')->group(function () {
     Route::get('/check-token', [AuthController::class, 'CheckToken']);
     Route::post('/transactions', [TransactionController::class, 'createTransaction']);
     Route::post('/create-category', [TransactionController::class, 'createCategory']);
