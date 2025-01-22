@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,16 +32,21 @@ Route::middleware(['throttle:10,1'])->group(function () {
 Route::middleware(['auth:sanctum', 'log.response.time'])->prefix('v1')->group(function () {
     Route::get('/check-token', [AuthController::class, 'CheckToken']);
     Route::post('/transactions', [TransactionController::class, 'createTransaction']);
-    Route::post('/create-category', [TransactionController::class, 'createCategory']);
-    Route::get('/get-category', [TransactionController::class, 'getCategory']);
+
+    Route::post('/create-category', [CategoryController::class, 'createCategory']);
+    Route::get('/get-category', [CategoryController::class, 'getCategory']);
+
     Route::post('/create-type', [TransactionController::class, 'createType']);
     Route::get('/get-type', [TransactionController::class, 'getType']);
-    Route::get('/reports/monthly', [TransactionController::class, 'getMonthly']);
+
+    Route::get('/reports/monthly', [ReportController::class, 'getMonthly']);
+
     Route::put('/budgets', [TransactionController::class, 'createBudget']);
-    Route::get('/get-budgets', [TransactionController::class, 'getBudget']);
+    Route::get('/get-budgets', [BudgetController::class, 'getBudget']);
     Route::get('/refund-budgets', [TransactionController::class, 'refundBudget']);
-    Route::post('/reminders', [TransactionController::class, 'createReminders']);
-    Route::get('/get-reminders', [TransactionController::class, 'GetReminder']);
-    Route::get('/check-reminders', [TransactionController::class, 'checkReminder']);
+
+    Route::post('/reminders', [ReminderController::class, 'createReminders']);
+    Route::get('/get-reminders', [ReminderController::class, 'GetReminder']);
+    Route::get('/check-reminders', [ReminderController::class, 'checkReminder']);
     Route::post('/pay-reminders', [TransactionController::class, 'payReminders']);
 });
