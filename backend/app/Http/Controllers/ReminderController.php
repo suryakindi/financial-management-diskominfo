@@ -99,6 +99,7 @@ class ReminderController extends Controller
     public function checkReminder(Request $request)
     {
         $today = now()->toDateString(); 
+
         Log::channel('single')->info('Proses cek reminder untuk user_id: ' . $request->id_user . ' pada tanggal: ' . $today);
     
         $reminder = Reminder::where('id_user', $request->id_user)

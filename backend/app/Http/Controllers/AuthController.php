@@ -82,6 +82,7 @@ class AuthController extends Controller
                     400
                 );
             }
+
     
             // Membuat pengguna baru
             $user = User::create([
@@ -89,6 +90,7 @@ class AuthController extends Controller
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
             ]);
+
     
             DB::commit();
     
